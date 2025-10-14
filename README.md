@@ -1,5 +1,7 @@
 # Spectral-Multiplicative Framework
 
+![img](./logo.png)
+
 A research framework that bridges quantum field theory, number theory, and practical optimization - discovering that **Riemann stability emerges as a conformal fixed point** and **applying these insights to build next-generation memory allocators**.
 
 ## Quick Start
