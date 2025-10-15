@@ -1,10 +1,5 @@
 # Spectral-Multiplicative Optimization: A Unified Framework for Enterprise-Scale Graph Partitioning
 
-**Authors:** [Author Names]
-**Affiliation:** [Institution]
-**Code Repository:** https://codeberg.org/aninokuma/malloc
-
-## Abstract
 
 Graph partitioning is a fundamental NP-hard problem with applications ranging from distributed computing to social network analysis. Traditional approaches either sacrifice mathematical rigor for scalability or achieve theoretical guarantees at prohibitive computational costs. We present a novel **Spectral-Multiplicative Framework** that bridges this gap by combining heat-kernel spectral theory with multiplicative prime-weight constraints in continuous angular space. Our key innovation is achieving ρ ≥ 0.99 correlation between spectral action and multiplicative functionals, enabling computationally efficient optimization while maintaining mathematical validity. The framework implements a Taylor series approximation of the heat kernel trace, reducing complexity from O(n³) to O(nnz·log n) for sparse graphs, where nnz represents non-zero edges. We demonstrate enterprise-scale performance on problems with 15,000+ nodes, achieving 99.6% constraint satisfaction with $1.4M/year cost savings in cloud optimization scenarios. The unified energy function combines spectral action, balance penalties, Shannon entropy, and multiplicative constraints through adaptive weight calibration, creating a powerful yet flexible optimization engine applicable to diverse problem domains including set partitioning, knapsack problems, and resource allocation.
 
