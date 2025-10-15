@@ -70,14 +70,13 @@ module MultiplicativeConstraint
       
       # Solve tridiagonal eigenvalue problem
       tridiag_eigenvalues = solve_tridiagonal_eigenvalues(alpha, beta)
+      pairs = tridiag_eigenvalues.each_with_index.to_a
       
       # Select k eigenvalues (largest or smallest)
       selected_indices = if @largest
-        # Sort in descending order, take first k
-        tridiag_eigenvalues.each_with_index.sort_by { |val, idx| -val }.first(@k).map { |_, idx| idx }
+        pairs.sort_by { |pair| -pair[0] }.first(@k).map { |pair| pair[1] }
       else
-        # Sort in ascending order, take first k
-        tridiag_eigenvalues.each_with_index.sort_by { |val, idx| val }.first(@k).map { |_, idx| idx }
+        pairs.sort_by { |pair| pair[0] }.first(@k).map { |pair| pair[1] }
       end
       
       selected_eigenvalues = selected_indices.map { |idx| tridiag_eigenvalues[idx] }

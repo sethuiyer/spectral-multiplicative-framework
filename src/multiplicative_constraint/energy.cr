@@ -574,6 +574,12 @@ module MultiplicativeConstraint
         # spectral + balance + weight_fairness_weight*weight_balance - entropy_weight*entropy - penalty_weight*weight_penalty
         unified = spectral + @fairness_weight * fairness + @weight_fairness_weight * weight_fairness - @entropy_weight * entropy - @penalty_weight * multiplicative_factor
       end
+      
+      # Boolean constraint penalties (SAT support)
+      if @graph.has_bool_constraints
+        bool_penalty = compute_bool_penalties(labels, unified.abs)
+        unified += bool_penalty
+      end
 
       Evaluation.new(
         segments: segs,
@@ -955,6 +961,37 @@ module MultiplicativeConstraint
       # Count undirected edges
       undirected_edges = neighbor_sets.values.reduce(0) { |sum, s| sum + s.size } / 2
       undirected_edges == @size
+    end
+    
+    # Compute boolean constraint penalties (SAT support)
+    private def compute_bool_penalties(labels : Array(Int32), base_magnitude : Float64) : Float64
+      penalty = 0.0
+      scale = Math.max(base_magnitude, @size.to_f * 100.0)
+      
+      # Penalty 1: Exclusivity violations (x_i and ¬x_i in same segment)
+      exclusivity_violations = 0
+      @graph.exclusivity_pairs.each do |i, j|
+        exclusivity_violations += 1 if labels[i] == labels[j]
+      end
+      # MASSIVE penalty - each violation should completely dominate
+      penalty += exclusivity_violations * scale * 10000.0
+      
+      # Penalty 2: Unsatisfied clauses
+      # Try both segment interpretations (0 or 1 = TRUE) and use the better one
+      min_unsat = [0, 1].map do |true_seg|
+        unsat = 0
+        @graph.clauses.each do |clause|
+          # Clause is unsatisfied if all literals are in the FALSE segment
+          all_false = clause.all? { |lit| labels[lit] != true_seg }
+          unsat += 1 if all_false
+        end
+        unsat
+      end.min
+      
+      # Heavy clause penalty
+      penalty += min_unsat * scale * 1000.0
+      
+      penalty
     end
 
     private def adjust_indices(indices : Array(Int32))

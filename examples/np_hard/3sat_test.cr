@@ -1,4 +1,4 @@
-require "../src/multiplicative_constraint"
+require "../../src/multiplicative_constraint"
 
 module Sat3Test
   include MultiplicativeConstraint

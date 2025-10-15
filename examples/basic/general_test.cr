@@ -1,4 +1,4 @@
-require "../src/multiplicative_constraint"
+require "../../src/multiplicative_constraint"
 
 module GeneralTest
   include MultiplicativeConstraint

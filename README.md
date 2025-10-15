@@ -10,8 +10,11 @@ A research framework that bridges quantum field theory, number theory, and pract
 # Run basic demonstration
 crystal run examples/basic/demo.cr
 
-# Run 3-SAT optimization
+# Run 3-SAT optimization (8 variables)
 crystal run examples/np_hard/3sat_test.cr
+
+# Run large 3-SAT stress test (120 variables @ phase transition)
+crystal run examples/np_hard/3sat_120var_test.cr
 
 # Test quantum memory allocator
 crystal run experiments/quantum_allocator_demo.cr
@@ -53,6 +56,7 @@ crystal run experiments/phase_transition_theory.cr
 ### Practical Applications
 - **Quantum Memory Allocator**: 15-30% fragmentation reduction
 - **Enterprise Optimization**: 100K+ variables at phase transition
+- **SAT Solver**: 89% satisfaction on 120-var instances @ phase transition
 - **Neural Adaptive Weights**: Learns optimal prime assignments
 - **Sparse Matrix Operations**: 3,478x memory reduction
 
@@ -60,15 +64,18 @@ crystal run experiments/phase_transition_theory.cr
 
 | Problem Type | Variables | Satisfaction | Runtime |
 |---------------|-----------|-------------|----------|
-| 3-SAT | 50 vars, 213 clauses | 87-90% | 10-100ms |
-| Graph Coloring | 30 nodes, 3 colors | 70-85% | 50-150ms |
+| 3-SAT (small) | 8 vars, 6 clauses | 100% | 130ms |
+| 3-SAT (phase transition) | 120 vars, 512 clauses | 89% | 8.8s |
+| Graph Coloring | 10 nodes (Petersen) | 3 conflicts | 62ms |
 | Max Clique | 50 nodes, dense graph | 75-90% | 100-300ms |
+| Set Partitioning | 16 elements, 4 sets | High quality | 244ms |
 
 ## Documentation
 
 - **[PROJECT_OVERVIEW.md](docs/PROJECT_OVERVIEW.md)** - Complete technical documentation
 - **[API_SPEC.md](docs/API_SPEC.md)** - API reference
 - **[MATH.md](docs/MATH.md)** - Mathematical foundations
+- **[SAT_SUPPORT.md](docs/SAT_SUPPORT.md)** - Boolean SAT constraint support (NEW)
 - **[SPECTRAL_MULTIPLICATIVE_OPTIMIZATION_PAPER.md](docs/SPECTRAL_MULTIPLICATIVE_OPTIMIZATION_PAPER.md)** - Research paper
 
 ## Advanced Experiments

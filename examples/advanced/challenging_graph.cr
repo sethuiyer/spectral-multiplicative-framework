@@ -1,4 +1,4 @@
-require "../src/multiplicative_constraint"
+require "../../src/multiplicative_constraint"
 
 module ChallengingGraph
   include MultiplicativeConstraint
@@ -11,7 +11,7 @@ module ChallengingGraph
     100.0, 5.0, 5.0, 5.0, 5.0,   # One heavy node + light neighbors
     50.0, 10.0, 10.0, 10.0, 10.0,  # Medium cluster
     25.0, 25.0, 25.0, 25.0, 25.0,  # Equal weight cluster
-    75.0, 8.0, 8.0, 8.0, 8.0, 8.0   # Another heavy + lights pattern
+    75.0, 8.0, 8.0, 8.0, 8.0   # Another heavy + lights pattern (20 total)
   ]
 
   # Create a more complex adjacency pattern
@@ -45,7 +45,7 @@ module ChallengingGraph
     "H1", "L1", "L2", "L3", "L4",     # Heavy + light cluster
     "M1", "M2", "M3", "M4", "M5",     # Medium cluster
     "E1", "E2", "E3", "E4", "E5",     # Equal weight cluster
-    "H2", "S1", "S2", "S3", "S4", "S5"  # Another heavy + small pattern
+    "H2", "S1", "S2", "S3", "S4"  # Another heavy + small pattern (20 total)
   ]
 
   def self.run

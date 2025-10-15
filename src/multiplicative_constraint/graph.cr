@@ -10,6 +10,11 @@ module MultiplicativeConstraint
     getter edge_types : Hash(String, SparseMatrix)
     getter type_weights : Hash(String, Float64)
     getter multi_type : Bool = false
+    
+    # Boolean constraint support (for SAT problems)
+    getter exclusivity_pairs : Array(Tuple(Int32, Int32))
+    getter clauses : Array(Array(Int32))
+    getter has_bool_constraints : Bool = false
 
     # Dense adjacency constructor (backward compatible)
     def initialize(weights : Array(Float64), dense_adjacency : Array(Array(Float64)))
@@ -27,6 +32,11 @@ module MultiplicativeConstraint
       @edge_types = Hash(String, SparseMatrix).new
       @type_weights = Hash(String, Float64).new
       @multi_type = false
+      
+      # Initialize boolean constraints (empty by default)
+      @exclusivity_pairs = Array(Tuple(Int32, Int32)).new
+      @clauses = Array(Array(Int32)).new
+      @has_bool_constraints = false
     end
 
       # Sparse adjacency constructor (efficient for large graphs)
@@ -44,6 +54,11 @@ module MultiplicativeConstraint
       @edge_types = Hash(String, SparseMatrix).new
       @type_weights = Hash(String, Float64).new
       @multi_type = false
+      
+      # Initialize boolean constraints (empty by default)
+      @exclusivity_pairs = Array(Tuple(Int32, Int32)).new
+      @clauses = Array(Array(Int32)).new
+      @has_bool_constraints = false
     end
 
     # Create from edge list with automatic symmetry
@@ -90,6 +105,11 @@ module MultiplicativeConstraint
       @adjacency = nil
       @use_sparse = true
       @multi_type = true
+      
+      # Initialize boolean constraints (empty by default)
+      @exclusivity_pairs = Array(Tuple(Int32, Int32)).new
+      @clauses = Array(Array(Int32)).new
+      @has_bool_constraints = false
     end
 
     # Create from multi-type edge lists - NEW
@@ -111,6 +131,28 @@ module MultiplicativeConstraint
       end
 
       new(weights, edge_types, type_weights)
+    end
+    
+    # SAT-specific constructor with boolean constraints
+    def self.from_sat(
+      weights : Array(Float64),
+      edges : Array(Tuple(Int32, Int32, Float64)),
+      exclusivity_pairs : Array(Tuple(Int32, Int32)),
+      clauses : Array(Array(Int32))
+    )
+      graph = from_edges(weights, edges, symmetric: false)
+      graph.set_bool_constraints(exclusivity_pairs, clauses)
+      graph
+    end
+    
+    # Set boolean constraints (SAT support)
+    def set_bool_constraints(
+      exclusivity_pairs : Array(Tuple(Int32, Int32)),
+      clauses : Array(Array(Int32))
+    )
+      @exclusivity_pairs = exclusivity_pairs
+      @clauses = clauses
+      @has_bool_constraints = true
     end
 
     def size

@@ -7,6 +7,8 @@
 
 require "./multiplicative_constraint/sparse_matrix"
 require "./multiplicative_constraint/lanczos"
+require "./multiplicative_constraint/linalg/lapack"
+require "./multiplicative_constraint/linalg/eigensolver"
 require "./multiplicative_constraint/ergodic"
 require "./multiplicative_constraint/graph"
 require "./multiplicative_constraint/weights"
