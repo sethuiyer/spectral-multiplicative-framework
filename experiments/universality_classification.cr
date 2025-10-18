@@ -13,7 +13,7 @@
 # - Conditional Class (ν_L oscillatory): Dirichlet L₄, non-unitary flow
 #
 
-require "./src/multiplicative_constraint"
+require "../src/multiplicative_constraint"
 require "math"
 
 module LFunctionUniversality

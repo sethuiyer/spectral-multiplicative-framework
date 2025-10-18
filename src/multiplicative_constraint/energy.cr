@@ -902,6 +902,94 @@ module MultiplicativeConstraint
       get_current_type_weights
     end
 
+    # Fast spectral evaluation (Laplacian-only) for training optimization
+    def fast_spectral_evaluate(alpha : Array(Float64))
+      segs = cuts_from_alpha(alpha)
+      labels = Array.new(@size, 0)
+      segs.each_with_index do |segment, idx|
+        segment.each { |i| labels[i] = idx }
+      end
+
+      # Fast spectral trace without full energy computation
+      degrees = Array.new(@size, 0.0)
+      cross_conflict = 0.0
+
+      if @graph.multi_type
+        current_type_weights = get_current_type_weights
+        @graph.edge_types.each do |type_name, matrix|
+          weight = current_type_weights[type_name]? || 1.0
+          @size.times do |i|
+            row = matrix.get_row(i)
+            row.each do |j, edge_weight|
+              next if i == j
+              weighted_edge = edge_weight * weight
+              if labels[i] == labels[j]
+                degrees[i] += weighted_edge
+                degrees[j] += weighted_edge
+              else
+                cross_conflict += weighted_edge
+              end
+            end
+          end
+        end
+      else
+        @graph.edges.each do |edge|
+          i, j, weight = edge
+          if labels[i] == labels[j]
+            degrees[i] += weight
+            degrees[j] += weight
+          else
+            cross_conflict += weight
+          end
+        end
+      end
+
+      # Fast heat trace approximation (order 2)
+      spectral = -heat_trace_fast(labels, degrees)
+
+      # Simple unified energy for training
+      unified = spectral + 0.1 * cross_conflict
+
+      # Create evaluation-like result
+      Evaluation.new(
+        segments: segs,
+        labels: labels,
+        spectral: spectral,
+        fairness: 0.0,
+        weight_fairness: 0.0,
+        entropy: 0.0,
+        penalty: 0.0,
+        cross_conflict: cross_conflict,
+        unified: unified
+      )
+    end
+
+    # Fast heat trace for training (reduced order)
+    private def heat_trace_fast(labels, degrees, order = 2)
+      samples = 2
+      seed = labels.reduce(17_u64) { |acc, val| (acc &* 31_u64) ^ val.to_u64 }
+      random = Random.new(seed)
+      sample_sum = 0.0
+
+      samples.times do
+        vector = Array(Float64).new(@size) { random.rand < 0.5 ? -1.0 : 1.0 }
+        current = vector.dup
+        factorial = 1.0
+        accum = 0.0
+
+        (0..order).each do |k|
+          coefficient = k.even? ? 1.0 : -1.0
+          accum += coefficient / factorial * dot(vector, current)
+          break if k == order
+          current = masked_laplacian_apply(labels, degrees, current)
+          factorial *= (k + 1).to_f
+        end
+        sample_sum += accum
+      end
+
+      sample_sum / samples
+    end
+
     # Set type weights manually (overrides neural network)
     def set_type_weights(weights : Hash(String, Float64)) : Nil
       weights.each do |type_name, weight|

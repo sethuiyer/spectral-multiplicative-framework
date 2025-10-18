@@ -4,7 +4,7 @@
 # Demonstrates the new multi-relational optimization capabilities
 #
 
-require "./src/multiplicative_constraint"
+require "../../src/multiplicative_constraint"
 
 def test_multi_type_graph
   puts "=" * 60
