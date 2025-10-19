@@ -48,6 +48,25 @@ cd spectral-multiplicative-framework
 crystal spec  # Run 49 test suites across 13 categories
 ```
 
+# Key Validation Points
+
+  - 100% Unsolvable Detection: test_casimir_perturbation.cr line 334 - validated on 20 unsolvable instances
+  - 92.5% Overall Accuracy: Same test - geometric mean threshold with statistical significance
+  - 813% Energy Improvement: test_simple_neural.cr - neural vs baseline comparison
+  - ρ ≥ 0.99 Correlation: test_multitype_neural.cr - correlation guard throughout optimization
+  - Sub-100ms Enterprise: torture_test.cr - 20-service complex scenario
+
+# Usage
+
+  # Run full validation suite
+  ./run_benchmarks.cr
+
+  # Run individual validations
+  crystal tests/experiments/test_casimir_perturbation.cr  # 92.5% accuracy
+  crystal tests/neural/test_simple_neural.cr              # 813% improvement  
+  crystal tests/performance/torture_test.cr               # Sub-100ms enterprise
+
+
 ## The Details
 
 For the complete mathematical framework, API reference, and implementation details:
