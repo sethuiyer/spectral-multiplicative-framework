@@ -2,8 +2,8 @@
 
 ![img](./logo.png)
 
-[ZENODO](zenodo.org/records/17556483)
-
+[[ZENODO](zenodo.org/records/17556483)
+](https://zenodo.org/records/17596089)
 
 > Where graph theory meets quantum mechanics in optimization space
 
