@@ -2,6 +2,9 @@
 
 ![img](./logo.png)
 
+[ZENODO](zenodo.org/records/17556483)
+
+
 > Where graph theory meets quantum mechanics in optimization space
 
 ## The Question
