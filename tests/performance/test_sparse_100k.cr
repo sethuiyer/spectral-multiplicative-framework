@@ -1,4 +1,4 @@
-require "./src/multiplicative_constraint"
+require "../../src/multiplicative_constraint"
 
 # Test Suite for Sparse Matrix Implementation
 # Validates 100K+ node optimization capability

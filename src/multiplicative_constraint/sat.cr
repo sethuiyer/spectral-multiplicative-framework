@@ -126,6 +126,10 @@ module MultiplicativeConstraint
       perturbed_forces = [] of Float64
       perturbation_count = num_perturbations || [@clauses.size * 2, 20].min  # Cap at 20 for speed
       
+      # Parallelize perturbation analysis using Channels
+      force_channel = Channel(Float64).new
+      tasks_spawned = 0
+      
       performed = 0
       @clauses.each_with_index do |clause, c_idx|
         break if performed >= perturbation_count
@@ -133,16 +137,26 @@ module MultiplicativeConstraint
         clause.each_with_index do |lit, l_idx|
           break if performed >= perturbation_count
           
-          # Flip this literal
-          perturbed_clauses = @clauses.dup
-          perturbed_clauses[c_idx] = clause.dup
-          perturbed_clauses[c_idx][l_idx] = -lit
+          # Spawn a fiber for each perturbation
+          spawn do
+            # Flip this literal
+            perturbed_clauses = @clauses.dup
+            perturbed_clauses[c_idx] = clause.dup
+            perturbed_clauses[c_idx][l_idx] = -lit
+            
+            # Measure force
+            force = measure_force_quick(perturbed_clauses)
+            force_channel.send(force)
+          end
           
-          # Measure force
-          force = measure_force_quick(perturbed_clauses)
-          perturbed_forces << force
+          tasks_spawned += 1
           performed += 1
         end
+      end
+      
+      # Collect results
+      tasks_spawned.times do
+        perturbed_forces << force_channel.receive
       end
       
       # Calculate variance

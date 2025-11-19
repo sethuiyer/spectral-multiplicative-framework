@@ -1,4 +1,4 @@
-require "./src/multiplicative_constraint"
+require "../../src/multiplicative_constraint"
 
 # Direct 100K test without full suite
 puts "🧪 DIRECT 100K NODE TEST"

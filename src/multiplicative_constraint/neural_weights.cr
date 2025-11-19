@@ -169,29 +169,43 @@ module MultiplicativeConstraint
         best_epoch_loss = Float64::INFINITY
         best_epoch_result = nil
         
+        # Multi-restart per epoch for robustness (Parallelized)
+        best_epoch_loss = Float64::INFINITY
+        best_epoch_result = nil
+        
+        result_channel = Channel(Tuple(Float64, PartitionResult)).new
+        
         3.times do |restart|
-          # Generate log-primes from network, convert to actual primes
-          log_primes = @network.forward_batch(@resources.size)
-          weights = log_primes.map { |lp| Math.exp(lp) }
-          
-          # Build circular graph with learned prime weights
-          edges = (0...@resources.size).map do |i|
-            j = (i + 1) % @resources.size
-            # Gap in log-space for smoother transitions
-            log_gap = (log_primes[j] - log_primes[i]).abs
-            edge_weight = 1.0 / (1.0 + log_gap)
-            {i, j, edge_weight}
+          spawn do
+            # Generate log-primes from network, convert to actual primes
+            log_primes = @network.forward_batch(@resources.size)
+            weights = log_primes.map { |lp| Math.exp(lp) }
+            
+            # Build circular graph with learned prime weights
+            edges = (0...@resources.size).map do |i|
+              j = (i + 1) % @resources.size
+              # Gap in log-space for smoother transitions
+              log_gap = (log_primes[j] - log_primes[i]).abs
+              edge_weight = 1.0 / (1.0 + log_gap)
+              {i, j, edge_weight}
+            end
+            
+            # Optimize with different seeds
+            graph = Graph.from_edges(weights, edges)
+            engine = Engine.new(graph, @k)
+            result = engine.solve(iterations: 1000, step: 0.35, seed: epoch * 100 + restart)
+            
+            # Compute loss
+            target = @resources.size.to_f64 / @k
+            loss = @network.compute_loss(result.segments, @constraints, target)
+            
+            result_channel.send({loss, result})
           end
-          
-          # Optimize with different seeds
-          graph = Graph.from_edges(weights, edges)
-          engine = Engine.new(graph, @k)
-          result = engine.solve(iterations: 1000, step: 0.35, seed: epoch * 100 + restart)
-          
-          # Compute loss
-          target = @resources.size.to_f64 / @k
-          loss = @network.compute_loss(result.segments, @constraints, target)
-          
+        end
+        
+        # Collect best result
+        3.times do
+          loss, result = result_channel.receive
           if loss < best_epoch_loss
             best_epoch_loss = loss
             best_epoch_result = result

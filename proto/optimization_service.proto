@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package spectral;
+
+service OptimizationService {
+  // Solves a generic partitioning problem
+  rpc Solve (GraphRequest) returns (PartitionResponse);
+  
+  // Runs the Casimir Diagnostic to check solvability
+  rpc Diagnose (DiagnosticRequest) returns (DiagnosticResponse);
+}
+
+message GraphRequest {
+  repeated double node_weights = 1;
+  repeated Edge edges = 2;
+  int32 segments = 3;
+  
+  // Optimization parameters
+  double fairness_weight = 4;
+  double penalty_weight = 5;
+  int32 iterations = 6;
+}
+
+message Edge {
+  int32 source = 1;
+  int32 target = 2;
+  double weight = 3;
+  string type = 4; // "love", "hate", "friend", etc.
+}
+
+message PartitionResponse {
+  repeated int32 assignments = 1; // Segment ID for each node
+  double energy = 2;
+  double spectral_energy = 3;
+  double fairness_score = 4;
+  bool success = 5;
+}
+
+message DiagnosticRequest {
+  int32 num_variables = 1;
+  repeated Clause clauses = 2;
+}
+
+message Clause {
+  repeated int32 literals = 1;
+}
+
+message DiagnosticResponse {
+  bool solvable = 1;
+  double confidence = 2;
+  double variance = 3;
+  string recommendation = 4;
+}

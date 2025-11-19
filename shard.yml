@@ -9,6 +9,12 @@ description: |
 
 crystal: ">= 1.8, < 2.0"
 
+dependencies:
+  grpc:
+    github: jeremey/grpc.cr
+  protobuf:
+    github: jeremey/protobuf.cr
+
 homepage: https://github.com/sethuiyer/spectral-multiplicative-framework
 
 license: Restricted

@@ -20,6 +20,7 @@ require "./multiplicative_constraint/constraint_weights"
 require "./multiplicative_constraint/neural_weights"
 require "./multiplicative_constraint/bethe_hessian"
 require "./multiplicative_constraint/sat"
+require "./list_coloring"
 
 module MultiplicativeConstraint
   # General-purpose constraint partitioning engine
